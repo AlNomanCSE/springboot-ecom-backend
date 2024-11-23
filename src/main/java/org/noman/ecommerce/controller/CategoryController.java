@@ -1,5 +1,6 @@
 package org.noman.ecommerce.controller;
 
+import jakarta.validation.Valid;
 import org.noman.ecommerce.model.Category;
 import org.noman.ecommerce.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CategoryController {
     }
 
     @PostMapping("/public/categories")
-    public ResponseEntity<String> createCategory(@RequestBody Category category) {
+    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category) {
         String categoryCreated = categoryService.createCategory(category);
         return new ResponseEntity<>(categoryCreated, HttpStatus.CREATED);
     }
@@ -46,7 +47,7 @@ public class CategoryController {
     }
 
     @PutMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<String> updateCategory(@RequestBody Category category,@PathVariable Long categoryId) {
+    public ResponseEntity<String> updateCategory(@Valid @RequestBody Category category,@PathVariable Long categoryId) {
         try {
             String status = categoryService.updateCategory(category,categoryId);
             return ResponseEntity.ok(status);

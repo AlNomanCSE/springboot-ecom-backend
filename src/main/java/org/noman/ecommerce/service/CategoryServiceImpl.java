@@ -1,16 +1,14 @@
 package org.noman.ecommerce.service;
 
+import org.noman.ecommerce.exceptions.APIException;
 import org.noman.ecommerce.exceptions.ResourceNotFoundException;
 import org.noman.ecommerce.model.Category;
 import org.noman.ecommerce.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -20,11 +18,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+        List<Category> allCategory = categoryRepository.findAll();
+        if(allCategory.isEmpty())  throw new APIException("No Category Found till now");
+        return allCategory;
     }
 
     @Override
     public String createCategory(Category category) {
+        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+        if(savedCategory != null) throw new APIException("Category with the name"+category.getCategoryName()+" already exists");
         categoryRepository.save(category);
         return "Category created \uD83E\uDD9C";
     }

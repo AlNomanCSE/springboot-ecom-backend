@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +27,13 @@ public class CategoryServiceImpl implements CategoryService {
     private ModelMapper modelMapper;
 
     @Override
-    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize) {
-//        Adding pagination
-        Pageable pageDetails = PageRequest.of(pageNumber, pageSize);
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+//        Soring with pagination
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+
+//        only Adding pagination
+//        Pageable pageDetails = PageRequest.of(pageNumber, pageSize);
         Page<Category> categories = categoryRepository.findAll(pageDetails);
 
         List<Category> allCategory = categories.getContent();

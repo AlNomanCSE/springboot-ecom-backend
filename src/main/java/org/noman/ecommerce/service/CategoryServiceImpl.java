@@ -8,6 +8,9 @@ import org.noman.ecommerce.payload.CategoryDTO;
 import org.noman.ecommerce.payload.CategoryResponse;
 import org.noman.ecommerce.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,15 +26,25 @@ public class CategoryServiceImpl implements CategoryService {
     private ModelMapper modelMapper;
 
     @Override
-    public CategoryResponse getAllCategories() {
-        List<Category> allCategory = categoryRepository.findAll();
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize) {
+//        Adding pagination
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize);
+        Page<Category> categories = categoryRepository.findAll(pageDetails);
+
+        List<Category> allCategory = categories.getContent();
+
         if (allCategory.isEmpty()) throw new APIException("No Category Found till now");
-        List<CategoryDTO> categoryDTOS = allCategory.stream()
+        List<CategoryDTO> categoryDTO = allCategory.stream()
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
                 .toList();
 
         CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setContent(categoryDTOS);
+        categoryResponse.setContent(categoryDTO);
+        categoryResponse.setPageNumber(categories.getNumber());
+        categoryResponse.setPageSize(categories.getSize());
+        categoryResponse.setTotalElements(categories.getTotalElements());
+        categoryResponse.setTotalPages(categories.getTotalPages());
+        categoryResponse.setLastPage(categories.isLast());
         return categoryResponse;
     }
 
@@ -61,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = modelMapper.map(categoryDTO, Category.class);
         category.setCategoryId(categoryId);
-       existingCategory = categoryRepository.save(category);
+        existingCategory = categoryRepository.save(category);
         return modelMapper.map(existingCategory, CategoryDTO.class);
     }
 

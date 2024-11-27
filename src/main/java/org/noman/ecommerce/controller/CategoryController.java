@@ -1,6 +1,7 @@
 package org.noman.ecommerce.controller;
 
 import jakarta.validation.Valid;
+import org.noman.ecommerce.config.AppConstants;
 import org.noman.ecommerce.model.Category;
 import org.noman.ecommerce.payload.CategoryDTO;
 import org.noman.ecommerce.payload.CategoryResponse;
@@ -24,7 +25,9 @@ public class CategoryController {
 
 
     @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponse> getAllCategorise(@RequestParam(name = "pageNumber") Integer pageNumber, @RequestParam(name = "pageSize") Integer pageSize) {
+    public ResponseEntity<CategoryResponse> getAllCategorise(@RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+                                                             @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize)
+    {
         CategoryResponse allCategories = categoryService.getAllCategories(pageNumber, pageSize);
         return new ResponseEntity<>(allCategories, HttpStatus.OK);
     }
